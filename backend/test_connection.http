@@ -1,0 +1,27 @@
+### Test Backend API Connection
+### Use this in VS Code with REST Client extension, or use Postman/curl
+
+### Test 1: Get all auctions
+GET http://localhost:3000/api/auctions
+Content-Type: application/json
+
+### Test 2: Create a new auction
+POST http://localhost:3000/api/auctions
+Content-Type: application/json
+
+{
+  "title": "Test Auction",
+  "description": "This is a test auction to verify connection",
+  "startingPrice": 100.00,
+  "currentPrice": 100.00,
+  "endTime": "2025-11-08T10:00:00Z",
+  "sellerId": "test-seller",
+  "sellerName": "Test Seller"
+}
+
+### Test 3: Get auction by ID
+GET http://localhost:3000/api/auctions/1
+Content-Type: application/json
+
+
+

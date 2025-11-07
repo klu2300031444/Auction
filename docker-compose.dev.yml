@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: auction-mysql-dev
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: CICDPROJECT
+      MYSQL_USER: auction_user
+      MYSQL_PASSWORD: auction_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_dev_data:/var/lib/mysql
+    networks:
+      - auction-network
+    restart: unless-stopped
+
+  # Spring Boot Backend (Development)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: auction-backend-dev
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/CICDPROJECT?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: admin
+      SPRING_PROFILES_ACTIVE: dev
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mysql
+    networks:
+      - auction-network
+    restart: unless-stopped
+    volumes:
+      - ./backend:/app
+      - /app/target
+
+  # React Frontend (Development with hot reload)
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile.dev
+    container_name: auction-frontend-dev
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - auction-network
+    restart: unless-stopped
+    volumes:
+      - ./Frontend:/app
+      - /app/node_modules
+
+volumes:
+  mysql_dev_data:
+
+networks:
+  auction-network:
+    driver: bridge
+

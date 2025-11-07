@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: auction-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: CICDPROJECT
+      MYSQL_USER: auction_user
+      MYSQL_PASSWORD: auction_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - auction-network
+    restart: unless-stopped
+
+  # Spring Boot Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: auction-backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/CICDPROJECT?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: admin
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mysql
+    networks:
+      - auction-network
+    restart: unless-stopped
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    container_name: auction-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - auction-network
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+
+networks:
+  auction-network:
+    driver: bridge
+
