@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/klu2300031444/Auction.git'
+               git branch: 'main', url: 'https://github.com/klu2300031444/Auction.git'
             }
         }
 
